@@ -1,0 +1,5 @@
+rootProject.name = 'cpd-proj-2'
+include 'cpd-client'
+include 'cpd-server'
+include 'cpd-shared'
+
