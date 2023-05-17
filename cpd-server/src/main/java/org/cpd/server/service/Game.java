@@ -5,7 +5,7 @@ import org.cpd.shared.User;
 import java.net.Socket;
 import java.util.Map;
 
-public class Game {
+public class Game implements Runnable{
     private Map<Integer, Socket> userSockets;
     public Game(int players, Map<Integer, Socket> userSockets) {
         if(players != userSockets.size()){
@@ -17,5 +17,10 @@ public class Game {
         System.out.println("Starting game with " + userSockets.size() + " players");
         //returns winner
         return null;
+    }
+
+    @Override
+    public void run() {
+
     }
 }
