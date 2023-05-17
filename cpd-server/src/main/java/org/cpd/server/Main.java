@@ -1,6 +1,5 @@
 package org.cpd.server;
 
-import org.cpd.server.service.ConnectionManager;
 import org.cpd.server.service.UserRepository;
 import org.cpd.shared.Config;
 
@@ -11,7 +10,6 @@ import java.net.Socket;
 public class Main {
     private static final UserRepository userRepository = new UserRepository();
     private static final Config config = new Config();
-    private static final ConnectionManager connectionManager = new ConnectionManager();
 
     public static void main(String[] args) {
 

@@ -13,7 +13,8 @@ public class MatchMaker {
     private static final int RANK_WIN = 10;
     private static final int RANK_LOSS = 10;
     private final UserRepository userRepository;
-    public static enum Type{
+
+    public enum Type{
         SIMPLE, RANK
     }
 

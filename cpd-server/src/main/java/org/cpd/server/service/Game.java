@@ -13,6 +13,7 @@ public class Game implements Runnable{
         }
         this.userSockets = userSockets;
     }
+
     public User start() {
         System.out.println("Starting game with " + userSockets.size() + " players");
         //returns winner
