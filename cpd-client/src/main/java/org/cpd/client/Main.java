@@ -13,7 +13,7 @@ import org.cpd.shared.Config;
  *
  * @author www.codejava.net
  */
-public class Client {
+public class Main {
     private static final Config config = new Config();
  
     public static void main(String[] args) {
