@@ -1,6 +1,6 @@
-package org.server.model;
+package org.cpd.server.model;
 
-import org.server.controller.Controller;
+import org.cpd.server.controller.Controller;
 import org.cpd.shared.request.Request;
 import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.Response;

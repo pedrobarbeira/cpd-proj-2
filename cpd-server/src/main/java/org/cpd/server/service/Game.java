@@ -1,4 +1,4 @@
-package org.server.service;
+package org.cpd.server.service;
 
 import org.cpd.shared.User;
 

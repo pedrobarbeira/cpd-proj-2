@@ -1,4 +1,4 @@
-package org.server.controller;
+package org.cpd.server.controller;
 
 import org.cpd.shared.request.Request;
 import org.cpd.shared.response.Response;

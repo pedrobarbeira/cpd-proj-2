@@ -1,7 +1,7 @@
-package org.server;
+package org.cpd.server;
 
-import org.server.service.ConnectionManager;
-import org.server.service.UserRepository;
+import org.cpd.server.service.ConnectionManager;
+import org.cpd.server.service.UserRepository;
 import org.cpd.shared.Config;
 
 import java.io.*;

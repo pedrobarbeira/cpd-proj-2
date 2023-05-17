@@ -1,4 +1,4 @@
-package org.server.model;
+package org.cpd.server.model;
 
 import java.net.Socket;
 import java.time.LocalDateTime;
