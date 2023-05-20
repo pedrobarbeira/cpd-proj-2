@@ -11,13 +11,13 @@ public class RequestFactory {
         this.config = config;
     }
 
-    public Request newRequest(String type){
+    public Request newRequest(RequestType type){
         this.count++;
         String requestId = String.format(Constants.REQUEST_ID_FORMAT, this.count, this.config.userId);
         return switch (type) {
-            case RequestType.AUTH -> new AuthRequest(requestId, config);
-            case RequestType.PLAY -> new PlayRequest(requestId, config);
-            case RequestType.REGISTER -> new RegisterRequest(requestId, config);
+            case AUTH -> new AuthRequest(requestId, config);
+            case PLAY -> new PlayRequest(requestId, config);
+            case REGISTER -> new AuthRequest(requestId, config, true);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

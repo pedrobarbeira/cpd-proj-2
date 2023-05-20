@@ -6,7 +6,8 @@ import java.net.Socket;
 import java.util.Map;
 
 public class Game implements Runnable{
-    private Map<Integer, Socket> userSockets;
+    private int gameId;
+    private final Map<Integer, Socket> userSockets;
     public Game(int players, Map<Integer, Socket> userSockets) {
         if(players != userSockets.size()){
             throw new RuntimeException("Number of players doesn't match number of sockets");
@@ -16,6 +17,7 @@ public class Game implements Runnable{
 
     public User start() {
         System.out.println("Starting game with " + userSockets.size() + " players");
+
         //returns winner
         return null;
     }

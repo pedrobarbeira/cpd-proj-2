@@ -1,8 +1,9 @@
 package org.cpd.shared.request;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class Request {
+public abstract class Request implements Serializable {
     protected static final String DELIMITER = ";";
 
     private final LocalDateTime date;
@@ -10,11 +11,11 @@ public abstract class Request {
     private final int userId;
     private final String host;
     private final int port;
-    private final String requestType;
-    private String requestBody;
+    private final RequestType requestType;
+    private Object requestBody;
 
 
-    public Request(String requestId, String host, int port, int userId, String requestType){
+    public Request(String requestId, String host, int port, int userId, RequestType requestType){
         this.requestId = requestId;
         this.host = host;
         this.port = port;
@@ -23,7 +24,7 @@ public abstract class Request {
         this.date = LocalDateTime.now();
     }
 
-    public Request(String requestId, String host, int port, int userId, String requestType, LocalDateTime dateTime){
+    public Request(String requestId, String host, int port, int userId, RequestType requestType, LocalDateTime dateTime){
         this.requestId = requestId;
         this.host = host;
         this.port = port;
@@ -32,44 +33,15 @@ public abstract class Request {
         this.date = dateTime;
     }
 
-    public void setRequestBody(String requestBody){
+    public void setRequestBody(Object requestBody){
         this.requestBody = requestBody;
     }
 
-    public String getRequestBody(){
+    public Object getRequestBody(){
         return this.requestBody;
     }
 
-    public String serialize(){
-        String portString = String.valueOf(this.port);
-        String userString = String.valueOf(this.userId);
-        String dateString = this.date.toString();
-        return String.join(DELIMITER, requestId, host, portString, userString, requestBody, requestType, dateString);
-    }
-
-    public static Request deserialize(String str){
-        String[] data = str.split(DELIMITER);
-        int port = Integer.parseInt(data[DataIndex.PORT]);
-        int id = Integer.parseInt(data[DataIndex.USER_ID]);
-        String type = data[DataIndex.TYPE];
-        Request request = null;
-        LocalDateTime dateTime = LocalDateTime.parse(data[DataIndex.DATE]);
-        switch (type) {
-            case RequestType.AUTH
-                    -> request = new AuthRequest(data[DataIndex.REQUEST_ID], data[DataIndex.HOST], port, id, dateTime);
-            case RequestType.PLAY
-                    -> request = new PlayRequest(data[DataIndex.REQUEST_ID], data[DataIndex.HOST], port, id, dateTime);
-            case RequestType.REGISTER
-                    -> request = new RegisterRequest(data[DataIndex.REQUEST_ID], data[DataIndex.HOST], port, id, dateTime);
-        };
-        if(request != null) {
-            request.setRequestBody(data[DataIndex.BODY]);
-        }
-        //TODO maybe add exception here
-        return request;
-    }
-
-    public String getType(){
+    public RequestType getType(){
         return this.requestType;
     }
 

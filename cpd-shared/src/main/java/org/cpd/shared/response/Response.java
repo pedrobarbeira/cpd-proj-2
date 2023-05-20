@@ -1,24 +1,25 @@
 package org.cpd.shared.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class Response {
+public abstract class Response implements Serializable {
 
     protected static final String DELIMITER = ";";
     private final LocalDateTime date;
     private String responseId;
     private int userId;
-    private int status;
-    private final String type;
-    private String responseBody;
+    private Status status;
+    private final ResponseType type;
+    private Object responseBody;
 
 
 
-    public Response(String responseId, int userId, int status, String responseBody, String type) {
+    public Response(String responseId, int userId, Status status, Object responseBody, ResponseType type) {
         this(responseId, userId, status, responseBody, type, LocalDateTime.now());
     }
 
-    public Response(String responseId, int userId, int status, String responseBody, String type, LocalDateTime dateTime) {
+    public Response(String responseId, int userId, Status status, Object responseBody, ResponseType type, LocalDateTime dateTime) {
         this.responseId = responseId;
         this.userId = userId;
         this.status = status;
@@ -35,11 +36,11 @@ public abstract class Response {
         return this.userId;
     }
 
-    public int getStatus(){
+    public Status getStatus(){
         return this.status;
     }
 
-    public String getResponseBody(){
+    public Object getResponseBody(){
         return this.responseBody;
     }
 
@@ -47,27 +48,8 @@ public abstract class Response {
         this.responseBody = content;
     }
 
-    public String serialize(){
-        String userString = String.valueOf(this.userId);
-        String statusString = String.valueOf(this.status);
-        String dateString = this.date.toString();
-        return String.join(DELIMITER, responseId, userString, statusString, responseBody, dateString, type);
-    }
-
-    public static Response deserialize(String str){
-        String[] data = str.split(DELIMITER);
-        int userId = Integer.parseInt(data[DataIndex.USER_ID]);
-        int status = Integer.parseInt(data[DataIndex.STATUS]);
-        LocalDateTime date = LocalDateTime.parse(data[DataIndex.DATE]);
-        Response response;
-        switch(data[DataIndex.TYPE]){
-            case ResponseType.AUTH
-                -> response = new AuthResponse(data[DataIndex.RESPONSE_ID], userId, status, data[DataIndex.BODY], date);
-            case ResponseType.PLAY
-                    -> response = new PlayResponse(data[DataIndex.RESPONSE_ID], userId, status, data[DataIndex.BODY], date);
-            default -> response = null;
-        }
-        return response;
+    public ResponseType getResponseType(){
+        return this.type;
     }
 
     private static class DataIndex {
@@ -79,7 +61,8 @@ public abstract class Response {
         public static final int TYPE = 5;
     }
 
-    public static class StatusCodes{
-        public static final int OK = 200;
+    public enum Status{
+        OK,
+        BAD
     }
 }

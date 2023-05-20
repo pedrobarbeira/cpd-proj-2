@@ -1,8 +1,10 @@
 package org.cpd.client.controller;
 
 import org.cpd.shared.User;
+import org.cpd.shared.response.AuthResponse;
 import org.cpd.shared.response.Response;
 import org.cpd.client.service.ClientStub;
+import org.cpd.shared.response.ResponseType;
 
 public class RequestController{
     private final ClientStub stub;
@@ -21,10 +23,10 @@ public class RequestController{
     }
 
     private User parseAuthResponse(Response response){
-        if(response.getStatus() == Response.StatusCodes.OK){
-            //TODO check if response is valid
-            String responseBody = response.getResponseBody();
-            return User.deserialize(responseBody);
+        if(response.getResponseType() == ResponseType.AUTH){
+            if(response.getStatus() == Response.Status.OK) {
+                return (User) response.getResponseBody();
+            }
         }
         //TODO maybe throw exception
         return null;

@@ -1,6 +1,9 @@
 package org.cpd.shared;
 
-public class Rank {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Rank implements Serializable {
     public static final int DEFAULT_OFFSET = 50;
     public static final int DEFAULT_START = 100;
     private int value;

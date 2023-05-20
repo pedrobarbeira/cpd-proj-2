@@ -7,9 +7,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class AuthRequest extends Request{
-    private static final String DELIMITER = ",";
+    boolean isRegister = false;
     public AuthRequest(String requestId, Config config) {
         super(requestId, config.host, config.authPort, config.userId, RequestType.AUTH);
+    }
+
+    public AuthRequest(String requestId, Config config, boolean isRegister) {
+        super(requestId, config.host, config.authPort, config.userId, RequestType.AUTH);
+        this.isRegister = isRegister;
     }
 
     public AuthRequest(String requestId, String host, int port, int userId, LocalDateTime dateTime) {
@@ -17,13 +22,15 @@ public class AuthRequest extends Request{
     }
 
     public void setCredentials(String name, String password){
-        String body = String.join(DELIMITER, List.of(name, password));
-        super.setRequestBody(body);
+        super.setRequestBody(new Credentials(name, password));
     }
 
     public Credentials getCredentials(){
-        String[] data = getRequestBody().split(DELIMITER);
-        return new Credentials(data[DataIndex.NAME], data[DataIndex.PASSWORD]);
+        return (Credentials) getRequestBody();
+    }
+
+    public boolean isRegister(){
+        return isRegister;
     }
 
     private static class DataIndex{

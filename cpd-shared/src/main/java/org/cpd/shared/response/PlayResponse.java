@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class PlayResponse extends Response{
 
-    public PlayResponse(String responseId, int userId, int status, String responseBody) {
+    public PlayResponse(String responseId, int userId, Response.Status status, Object responseBody) {
         super(responseId, userId, status, responseBody, ResponseType.PLAY);
     }
 
-    public PlayResponse(String responseId, int userId, int status, String responseBody, LocalDateTime dateTime) {
+    public PlayResponse(String responseId, int userId, Response.Status status, Object responseBody, LocalDateTime dateTime) {
         super(responseId, userId, status, responseBody, ResponseType.PLAY, dateTime);
     }
 

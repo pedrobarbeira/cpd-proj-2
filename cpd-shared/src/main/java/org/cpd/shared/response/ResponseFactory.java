@@ -1,18 +1,18 @@
 package org.cpd.shared.response;
 
 public class ResponseFactory {
-    private int count;
+    private static int count;
 
     public ResponseFactory(){
-        this.count = 0;
+        count = 0;
     }
 
-    public Response newResponse(int userId, int status, String body, String type){
-        this.count++;
-        String requestId = String.format(Constants.REQUEST_ID_FORMAT, this.count, userId);
+    public static Response newResponse(int userId, Response.Status status, Object body, ResponseType type){
+        count++;
+        String requestId = String.format(Constants.REQUEST_ID_FORMAT, count, userId);
         return switch (type) {
-            case ResponseType.AUTH -> new AuthResponse(requestId, userId, status, body);
-            case ResponseType.PLAY -> new PlayResponse(requestId, userId, status, body);
+            case AUTH -> new AuthResponse(requestId, userId, status, body);
+            case PLAY -> new PlayResponse(requestId, userId, status, body);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

@@ -6,12 +6,15 @@ import org.cpd.shared.User;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class UserRepository {
-    private final URL dataUrl = getClass().getClassLoader().getResource("users.csv");
+    private final URL dataUrl = getClass().getClassLoader().getResource(DataConstants.FILE_PATH);
     private int count;
     //TODO concurrency control here
     Map<Integer, User> userData;
@@ -21,22 +24,29 @@ public class UserRepository {
         count = 0;
         userData = new HashMap<>();
         try {
-            File file = new File(dataUrl.toURI());
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] data = line.split(",");
-                int id = Integer.parseInt(data[DataConstants.ID]);
-                User user = new User(id, data[DataConstants.NAME],
-                        data[DataConstants.PASSWORD],
-                        Integer.parseInt(data[DataConstants.RANK]));
-                userData.put(id, user);
-                count++;
+            assert dataUrl != null;
+            File dir = new File(dataUrl.toURI());
+            for(File file : Objects.requireNonNull(dir.listFiles())) {
+                Scanner scanner = new Scanner(file);
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    String[] data = line.split(",");
+                    int id = Integer.parseInt(data[DataConstants.ID]);
+                    User user = new User(id, data[DataConstants.NAME],
+                            data[DataConstants.PASSWORD],
+                            Integer.parseInt(data[DataConstants.RANK]));
+                    userData.put(id, user);
+                    count++;
+                }
+                scanner.close();
             }
-            scanner.close();
         }catch(URISyntaxException | IOException e){
             e.printStackTrace();
         }
+    }
+
+    public Collection<User> getAll(){
+        return userData.values();
     }
     
     public int getNextId(){
@@ -71,12 +81,28 @@ public class UserRepository {
         return toReturn;
     }
 
+    //TODO fix persistence
     public boolean addUser(User user){
         User nameCheck = getByName(user.getName());
         if(nameCheck == null) {
             this.count++;
             this.userData.put(this.count, user);
-            return true;
+            assert dataUrl != null;
+            String fileName = String.format("%s%d",DataConstants.FILE_BASE, count);
+            try {
+                String filePath = String.format("%s%s", dataUrl, fileName);
+                File file = Files.createFile(Path.of(filePath)).toFile();
+                FileWriter out = new FileWriter(file);
+                String data = String.format("%s,%s,%s,%s\n", user.getId(), user.getName(), user.getPassword(), user.getRank().getValue());
+                out.write(data);
+                String msg = String.format("New User [%s] with id [%d]", user.getName(), user.getId());
+                System.out.println(msg);
+                return true;
+            } catch (IOException e) {
+                String msg = String.format("Could not register user [%s]", user.getName());
+                System.out.println(msg);
+                return false;
+            }
         }
         return false;
     }
@@ -102,6 +128,7 @@ public class UserRepository {
         public static final int NAME = 1;
         public static final int PASSWORD = 2;
         public static final int RANK = 3;
-        public static final String FILE_PATH = "users.csv";
+        public static final String FILE_PATH = "user-data/";
+        public static final String FILE_BASE = "user-";
     }
 }

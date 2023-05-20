@@ -4,7 +4,7 @@ import org.cpd.client.controller.GameController;
 import org.cpd.client.controller.RequestController;
 import org.cpd.shared.User;
 import org.cpd.client.view.AuthView;
-import org.cpd.client.view.PlayView;
+import org.cpd.client.view.GameView;
 import org.cpd.client.service.ClientStub;
 import org.cpd.shared.Config;
 
@@ -23,8 +23,9 @@ public class Main {
         AuthView authMenu = new AuthView(requestController);
         User user = authMenu.run();
         if(user != null){
+            System.out.println("Welcome to the club now");
             GameController gameController = new GameController(requestController);
-            PlayView playMenu = new PlayView(user, gameController);
+            GameView playMenu = new GameView(user, gameController);
         }
 
 //        if (args.length < 2) return;

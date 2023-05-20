@@ -1,13 +1,13 @@
 package org.cpd.shared;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private static final String DELIMITER = ",";
     private final int id;
     private final Credentials credentials;
     private final Rank rank;
     private String token;
-
-
 
     public User (int id, String name, String password){
         this(id, name, password, null, null);

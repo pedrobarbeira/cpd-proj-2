@@ -1,6 +1,8 @@
 package org.cpd.shared;
 
-public class Credentials {
+import java.io.Serializable;
+
+public class Credentials implements Serializable {
 
     private final String name;
     private final String password;

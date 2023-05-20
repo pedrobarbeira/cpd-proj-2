@@ -6,35 +6,39 @@ import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.Response;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class ServerThread implements Runnable{
-    private final ServerSocket serverSocket;
+
+    private final ServerSocketChannel serverSocket;
+
     private final Controller controller;
 
     public ServerThread(int port, Controller controller) throws IOException {
-        serverSocket = new ServerSocket(port);
+        serverSocket = ServerSocketChannel.open();
+        serverSocket.bind(new InetSocketAddress(port));
         this.controller = controller;
     }
 
     @Override
     public void run() {
         while(true) {
-            try (Socket socket = serverSocket.accept()) {
-                InputStream inputStream = socket.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String data = reader.readLine();
-                Request request = Request.deserialize(data);
+            try (SocketChannel socket = serverSocket.accept()) {
+                ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
+                Request request = (Request) is.readObject();
+                System.out.println("New client connected: " + request.getRequestBody());
                 Response response = controller.handleRequest(request);
-                OutputStream outputStream = socket.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-                writer.write(response.serialize());
+                ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
+                os.writeObject(response);
                 if(request.getType().equals(RequestType.DISCONNECT)){
                     System.out.println("Disconnecting from socket");
                     return;
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

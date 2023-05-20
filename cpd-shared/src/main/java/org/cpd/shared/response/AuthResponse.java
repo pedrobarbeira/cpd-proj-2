@@ -6,19 +6,16 @@ import org.cpd.shared.User;
 import java.time.LocalDateTime;
 
 public class AuthResponse extends Response{
-    public AuthResponse(String responseId, int userId, int status, String responseBody) {
+    public AuthResponse(String responseId, int userId, Response.Status status, Object responseBody) {
         super(responseId, userId, status, responseBody, ResponseType.AUTH);
     }
 
-    public AuthResponse(String responseId, int userId, int status, String responseBody, LocalDateTime dateTime) {
+    public AuthResponse(String responseId, int userId, Response.Status status, Object responseBody, LocalDateTime dateTime) {
         super(responseId, userId, status, responseBody, ResponseType.AUTH, dateTime);
     }
 
-    public User getContent(){
-        String[] data = getResponseBody().split(DELIMITER);
-        int id = Integer.parseInt(data[DataIndex.ID]);
-        int rank = Integer.parseInt(data[DataIndex.RANK]);
-        return new User(id, data[DataIndex.NAME], data[DataIndex.PASSWORD], rank, data[DataIndex.TOKEN]);
+    public User getUser(){
+        return (User) getResponseBody();
     }
 
     public void setContent(User user){

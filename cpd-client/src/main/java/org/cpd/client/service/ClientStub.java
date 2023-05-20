@@ -1,14 +1,14 @@
 package org.cpd.client.service;
 
+import org.cpd.shared.request.*;
 import org.cpd.shared.Config;
-import org.cpd.shared.request.AuthRequest;
-import org.cpd.shared.request.RegisterRequest;
-import org.cpd.shared.request.RequestFactory;
-import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.Response;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
+import java.time.LocalDateTime;
 
 public class ClientStub {
     private final Config config;
@@ -19,40 +19,33 @@ public class ClientStub {
         this.requestFactory = new RequestFactory(config);
     }
 
-    private Response sendRequest(String msg, Socket socket) throws IOException {
-            OutputStream out = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(out, true);
-            writer.println(msg);
-            InputStream in = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String response = reader.readLine();
-            return Response.deserialize(response);
+    private Response sendRequest(Request request, SocketChannel socket) throws IOException, ClassNotFoundException {
+        ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
+        os.writeObject(request);
+        ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
+        return (Response) is.readObject();
+    }
+
+    private Response sendAuthRequest(Request request){
+        try(SocketChannel socket = SocketChannel.open()){
+            socket.connect(new InetSocketAddress(config.host, config.authPort));
+            return sendRequest(request, socket);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Response authenticate(String name, String password){
         AuthRequest request = (AuthRequest) requestFactory.newRequest(RequestType.AUTH);
         request.setCredentials(name, password);
-        String msg = request.serialize();
-        try {
-            Socket socket = new Socket(config.host, config.authPort);
-            return sendRequest(msg, socket);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return null;
+        return sendAuthRequest(request);
     }
 
     public Response register(String name, String password){
-        RegisterRequest request = (RegisterRequest) requestFactory.newRequest(RequestType.REGISTER);
+        AuthRequest request = (AuthRequest) requestFactory.newRequest(RequestType.REGISTER);
         request.setCredentials(name, password);
-        String msg = request.serialize();
-        try {
-            Socket socket = new Socket(config.host, config.authPort);
-            return sendRequest(msg, socket);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return null;
+        return sendAuthRequest(request);
     }
 
     public void registerMatch(){}
