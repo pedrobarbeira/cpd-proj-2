@@ -43,12 +43,14 @@ public class GameController implements Controller {
             }
             if(game != null){
                 executor.execute(game);
+                return ResponseFactory.newResponse(request.getUserId(), Response.Status.OK, "Game Started", ResponseType.PLAY);
             }
         }
         return ResponseFactory.newResponse(request.getUserId(), Response.Status.OK, "Looking for a match", ResponseType.PLAY);
     }
 
     private Response handleDisconnectRequest(PlayRequest request){
+        System.out.println("[LOG] Received disconnect");
         int id = request.getUserId();
         String requestToken = request.getToken();
         String userToken = userRepository.getUserTokenById(id);

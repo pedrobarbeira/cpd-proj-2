@@ -34,7 +34,8 @@ public class ServerThread implements Runnable{
     @Override
     public void run() {
         while(true) {
-            try (SocketChannel socket = serverSocket.accept()) {
+            try {
+                SocketChannel socket = serverSocket.accept();
                 ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
                 Request request = (Request) is.readObject();
                 System.out.println("New client connected: " + request.getRequestBody());

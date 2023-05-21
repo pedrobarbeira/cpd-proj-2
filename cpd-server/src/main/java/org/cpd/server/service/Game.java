@@ -15,7 +15,7 @@ public class Game implements Runnable {
     private final NumberGuessingGame game;
 
     public Game(List<Pair<Integer, SocketChannel>> playerList) {
-        this.playerList = playerList;
+        this.playerList = List.copyOf(playerList);
         this.game = new NumberGuessingGame(playerList.size(), 3, 10);
 
     }
@@ -23,7 +23,8 @@ public class Game implements Runnable {
     private void setUp() throws Exception {
         int c = 0;
         for (var pair : playerList) {
-            GameController.sendMessage(pair.second, pair.first, game.greet(c));
+            SocketChannel s = pair.second;
+            GameController.sendMessage(s, pair.first, game.greet(c));
             c++;
         }
 
@@ -72,7 +73,8 @@ public class Game implements Runnable {
             loop();
             tearDown();
         } catch (Exception e) {
-            System.out.println("Something went wrong");
+            System.err.println("Something Went Wrong while running the game");
+            e.printStackTrace();
         }
     }
 

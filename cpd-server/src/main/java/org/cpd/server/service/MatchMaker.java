@@ -21,7 +21,7 @@ public class MatchMaker {
         if(match.size() == config.maxPlayers){
             System.out.println("[LOG] Creating a game");
             Game game = new Game(match);
-            match.clear();
+            //match.clear();
             return game;
         }
         return null;
