@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static java.lang.Thread.sleep;
+
 public class GameView {
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private final GameController controller;
@@ -67,9 +69,11 @@ public class GameView {
         play();
     }
 
-    private void play(){
-        String msg;
-        msg = controller.turn();
+    private void play() {
+        String msg = null;
+        while (msg == null) {
+            msg = controller.turn();
+        }
         System.out.println(msg);
         System.out.println("$");
         try {
@@ -77,8 +81,7 @@ public class GameView {
             String result = controller.makeMove(msg);
             System.out.println(result);
         } catch (IOException e) {
-            wait(1000);
-            System.out.println("Looking for a match...");
+            e.printStackTrace();
         }
         msg = controller.turn();
         System.out.println(msg);

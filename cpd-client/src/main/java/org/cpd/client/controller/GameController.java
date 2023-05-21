@@ -41,9 +41,11 @@ public class GameController {
     private String findMatch(GameType gameType){
         PlayRequest request = makePlayRequest(gameType);
         try {
-            PlayResponse response = (PlayResponse) stub.sendRequest(request);
-            if(response != null){
-                return (String) response.getResponseBody();
+            while(true) {
+                PlayResponse response = (PlayResponse) stub.sendRequest(request);
+                if (response != null) {
+                    return (String) response.getResponseBody();
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
