@@ -13,6 +13,7 @@ public class ResponseFactory {
         return switch (type) {
             case AUTH -> new AuthResponse(requestId, userId, status, body);
             case PLAY -> new PlayResponse(requestId, userId, status, body);
+            case DISCONNECT -> new PlayResponse(requestId, userId, status, body, true);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

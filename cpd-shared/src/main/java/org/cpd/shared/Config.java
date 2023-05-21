@@ -11,13 +11,6 @@ public class Config {
     public final int timeout = 30;
     public final int maxPlayers = 4;
 
-    public int userId = Constants.NO_USER;
+    public final int NO_USER = 0;
 
-    public void setUserId(int id){
-        this.userId = id;
-    }
-
-    private static class Constants{
-        public static final int NO_USER = -1;
-    }
 }

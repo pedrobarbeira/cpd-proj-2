@@ -8,6 +8,8 @@ import org.cpd.shared.request.Request;
 import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.*;
 
+import java.util.UUID;
+
 public class AuthController extends RequestController implements Controller{
     public static final int NULL_USER_ID = 0;
     public static final String INVALID_CREDENTIALS = "Invalid credentials";
@@ -42,8 +44,14 @@ public class AuthController extends RequestController implements Controller{
                     return ResponseFactory.newResponse(NULL_USER_ID, Response.Status.BAD, INVALID_CREDENTIALS, ResponseType.AUTH);
                 }
             }
+            String token = generateToken();
+            user.setToken(token);
             return ResponseFactory.newResponse(user.getId(), Response.Status.OK, user, ResponseType.AUTH);
         }
         return ResponseFactory.newResponse(NULL_USER_ID, Response.Status.BAD, INVALID_REQUEST, ResponseType.AUTH);
+    }
+
+    private String generateToken(){
+        return UUID.randomUUID().toString();
     }
 }

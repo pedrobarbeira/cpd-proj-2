@@ -18,31 +18,38 @@ public class AuthView{
         this.controller = controller;
     }
 
-    public User run(){
-        System.out.println(Messages.LOGIN);
-        System.out.println(Messages.REGISTER);
-        System.out.println(Messages.EXIT);
-        String option = null;
-        User user = null;
-        try {
-            while(true){
-                System.out.print(Messages.PROMPT);
-                option = reader.readLine();
-                if(!(option.equals(Options.LOGIN)
-                        || option.equals(Options.REGISTER)
-                        || option.equals(Options.EXIT))) {
-                    System.out.println(Messages.INVALID_OPTION);
-                }else break;
+    public User run() {
+        while (true) {
+            System.out.println(Messages.LOGIN);
+            System.out.println(Messages.REGISTER);
+            System.out.println(Messages.EXIT);
+            String option;
+            try {
+                while (true) {
+                    System.out.print(Messages.PROMPT);
+                    option = reader.readLine();
+                    if (!(option.equals(Options.LOGIN)
+                            || option.equals(Options.REGISTER)
+                            || option.equals(Options.EXIT))) {
+                        System.out.println(Messages.INVALID_OPTION);
+                    } else break;
+                }
+                switch (option) {
+                    case Options.LOGIN -> {
+                        return auth(Options.LOGIN);
+                    }
+                    case Options.REGISTER -> {
+                        return auth(Options.REGISTER);
+                    }
+                    case Options.EXIT -> {
+                        return exit();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
             }
-            switch(option){
-                case Options.LOGIN -> user = auth(Options.LOGIN);
-                case Options.REGISTER -> user = auth(Options.REGISTER);
-                case Options.EXIT -> exit();
-            }
-        }catch(IOException e){
-            e.printStackTrace();;
         }
-        return user;
     }
 
     private User auth(String option){
@@ -60,7 +67,6 @@ public class AuthView{
                 System.out.print(Messages.USERNAME);
                 username = reader.readLine();
                 if (username.equals(Options.EXIT_STRING)) {
-                    exit();
                     return null;
                 }
                 matcher = pattern.matcher(username);
@@ -73,7 +79,6 @@ public class AuthView{
                 System.out.print(Messages.PASSWORD);
                 password = reader.readLine();
                 if (password.equals(Options.EXIT_STRING)) {
-                    exit();
                     return null;
                 }
                 matcher = pattern.matcher(password);
@@ -92,14 +97,11 @@ public class AuthView{
         }
     }
 
-    public static void exit(){
+    public static User exit(){
         System.out.println(Messages.GOODBYE);
+        return null;
     }
 
-    public enum State{
-        PLAY,
-        EXIT
-    }
     public static class Messages{
         public static final String LOGIN = String.format("\t[%s] Login", Options.LOGIN);
         public static final String REGISTER = String.format("\t[%s] Register", Options.REGISTER);

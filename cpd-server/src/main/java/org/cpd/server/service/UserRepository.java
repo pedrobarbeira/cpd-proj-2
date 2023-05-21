@@ -3,10 +3,7 @@ package org.cpd.server.service;
 import org.cpd.shared.Rank;
 import org.cpd.shared.User;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -56,6 +53,11 @@ public class UserRepository {
     public int getCount(){
         return this.count;
     }
+
+    public String getUserTokenById(int id){
+        User user = userData.get(id);
+        return user.getToken();
+    }
     
     public User getById(int id){
         return userData.get(id);
@@ -87,40 +89,51 @@ public class UserRepository {
         if(nameCheck == null) {
             this.count++;
             this.userData.put(this.count, user);
-            assert dataUrl != null;
-            String fileName = String.format("%s%d",DataConstants.FILE_BASE, count);
-            try {
-                String filePath = String.format("%s%s", dataUrl, fileName);
-                File file = Files.createFile(Path.of(filePath)).toFile();
-                FileWriter out = new FileWriter(file);
-                String data = String.format("%s,%s,%s,%s\n", user.getId(), user.getName(), user.getPassword(), user.getRank().getValue());
-                out.write(data);
-                String msg = String.format("New User [%s] with id [%d]", user.getName(), user.getId());
-                System.out.println(msg);
-                return true;
-            } catch (IOException e) {
-                String msg = String.format("Could not register user [%s]", user.getName());
-                System.out.println(msg);
-                return false;
+            try{
+                if(save(user)){
+                    String msg =String.format("User [%s] data successfully saved", user.getName());
+                    System.out.println(msg);
+                    return true;
+                }
+            }catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        String msg = String.format("Could not register user [%s]", user.getName());
+        System.out.println(msg);
         return false;
     }
 
-
-    public void save() {
+    public boolean saveById(int id){
+        User user = getById(id);
         try{
-            File file = new File(dataUrl.toURI());
-            FileWriter out = new FileWriter(file);
-            String format = "%s,%s,%s,%s\n";
-            for(User user : userData.values()){
-                Rank rank = user.getRank();
-                String data = String.format(format, user.getId(), user.getName(), user.getPassword(), rank.getValue());
-                out.write(data);
-            }
-        }catch(URISyntaxException | IOException e){
+            return save(user);
+        }catch(IOException e){
             e.printStackTrace();
+            return false;
         }
+    }
+
+
+    private boolean save(User user) throws IOException {
+        assert dataUrl != null;
+        String filePath = String.format("%s%d", DataConstants.FILE_BASE, count);
+        File userFile = new File(filePath);
+        if (!userFile.exists()) {
+            if(userFile.createNewFile()) {
+                FileWriter writer = new FileWriter(userFile);
+                String data = getPersistenceData(user);
+                writer.write(data);
+                return true;
+            }
+        }
+        String msg = String.format("Could not save user [%s]", user.getName());
+        System.out.println(msg);
+        return false;
+    }
+
+    public String getPersistenceData(User user){
+        return String.format("%d,%s,%s,%d", user.getId(), user.getName(), user.getPassword(), user.getRank().getValue());
     }
 
     private static class DataConstants{
@@ -129,6 +142,6 @@ public class UserRepository {
         public static final int PASSWORD = 2;
         public static final int RANK = 3;
         public static final String FILE_PATH = "user-data/";
-        public static final String FILE_BASE = "user-";
+        public static final String FILE_BASE = "cpd-server/src/main/resources/user-data/user-";
     }
 }

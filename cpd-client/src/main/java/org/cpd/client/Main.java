@@ -15,17 +15,17 @@ import org.cpd.shared.Config;
  */
 public class Main {
     private static final Config config = new Config();
- 
+
     public static void main(String[] args) {
 
         ClientStub stub = new ClientStub(config);
         RequestController requestController = new RequestController(stub);
         AuthView authMenu = new AuthView(requestController);
         User user = authMenu.run();
-        if(user != null){
-            System.out.println("Welcome to the club now");
-            GameController gameController = new GameController(requestController);
+        if(user != null) {
+            GameController gameController = new GameController(stub);
             GameView playMenu = new GameView(user, gameController);
+            playMenu.run();
         }
 
 //        if (args.length < 2) return;

@@ -7,18 +7,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class AuthRequest extends Request{
+    public static final int NO_USER = 0;
     boolean isRegister = false;
-    public AuthRequest(String requestId, Config config) {
-        super(requestId, config.host, config.authPort, config.userId, RequestType.AUTH);
+    public AuthRequest(String requestId) {
+        super(requestId, NO_USER, RequestType.AUTH);
     }
 
-    public AuthRequest(String requestId, Config config, boolean isRegister) {
-        super(requestId, config.host, config.authPort, config.userId, RequestType.AUTH);
+    public AuthRequest(String requestId, boolean isRegister) {
+        super(requestId, NO_USER, RequestType.AUTH);
         this.isRegister = isRegister;
     }
 
-    public AuthRequest(String requestId, String host, int port, int userId, LocalDateTime dateTime) {
-        super(requestId, host, port, userId, RequestType.AUTH, dateTime);
+    public AuthRequest(String requestId, LocalDateTime dateTime) {
+        super(requestId, NO_USER, RequestType.AUTH, dateTime);
     }
 
     public void setCredentials(String name, String password){

@@ -1,24 +1,66 @@
 package org.cpd.client.service;
 
-import org.cpd.shared.request.*;
 import org.cpd.shared.Config;
+import org.cpd.shared.User;
+import org.cpd.shared.request.*;
 import org.cpd.shared.response.Response;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.channels.SocketChannel;
-import java.time.LocalDateTime;
 
 public class ClientStub {
+    public static final String SEND_ERROR = "Could not send request";
     private final Config config;
-    private final RequestFactory requestFactory;
+    private SocketChannel socket;
 
     public ClientStub(Config config){
         this.config = config;
-        this.requestFactory = new RequestFactory(config);
     }
 
+    public Config getConfig(){
+        return this.config;
+    }
+
+    public void registerSocket(SocketChannel socket){
+        this.socket = socket;
+    }
+
+
+    public Response authenticate(String name, String password){
+        AuthRequest request = (AuthRequest) RequestFactory.newRequest(RequestType.AUTH, config.NO_USER);
+        request.setCredentials(name, password);
+        return sendAuthRequest(request);
+    }
+
+    public Response register(String name, String password){
+        AuthRequest request = (AuthRequest) RequestFactory.newRequest(RequestType.REGISTER, config.NO_USER);
+        request.setCredentials(name, password);
+        return sendAuthRequest(request);
+    }
+
+    public Response disconnect(User user){
+        PlayRequest request = (PlayRequest) RequestFactory.newRequest(RequestType.DISCONNECT, user.getId());
+        request.setToken(user.getToken());
+        try {
+            return sendRequest(request);
+        } catch (ClassNotFoundException | IOException e) {
+            System.out.println(SEND_ERROR);
+            return null;
+        }
+    }
+
+    public void registerMatch(){}
+
+    public void playGame(){}
+
+    public void registerPlay(){}
+
+    private Response sendRequest(Request request) throws IOException, ClassNotFoundException {
+        return sendRequest(request, socket);
+    }
     private Response sendRequest(Request request, SocketChannel socket) throws IOException, ClassNotFoundException {
         ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
         os.writeObject(request);
@@ -31,27 +73,11 @@ public class ClientStub {
             socket.connect(new InetSocketAddress(config.host, config.authPort));
             return sendRequest(request, socket);
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println(SEND_ERROR);
             e.printStackTrace();
             return null;
         }
     }
 
-    public Response authenticate(String name, String password){
-        AuthRequest request = (AuthRequest) requestFactory.newRequest(RequestType.AUTH);
-        request.setCredentials(name, password);
-        return sendAuthRequest(request);
-    }
-
-    public Response register(String name, String password){
-        AuthRequest request = (AuthRequest) requestFactory.newRequest(RequestType.REGISTER);
-        request.setCredentials(name, password);
-        return sendAuthRequest(request);
-    }
-
-    public void registerMatch(){}
-
-    public void playGame(){}
-
-    public void registerPlay(){}
 
 }

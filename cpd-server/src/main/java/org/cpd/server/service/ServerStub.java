@@ -4,7 +4,6 @@ import org.cpd.server.controller.AuthController;
 import org.cpd.server.controller.GameController;
 import org.cpd.server.model.ServerThread;
 import org.cpd.shared.Config;
-import org.cpd.shared.response.ResponseFactory;
 
 import java.io.IOException;
 

@@ -9,25 +9,19 @@ public abstract class Request implements Serializable {
     private final LocalDateTime date;
     private final String requestId;
     private final int userId;
-    private final String host;
-    private final int port;
     private final RequestType requestType;
     private Object requestBody;
 
 
-    public Request(String requestId, String host, int port, int userId, RequestType requestType){
+    public Request(String requestId, int userId, RequestType requestType){
         this.requestId = requestId;
-        this.host = host;
-        this.port = port;
         this.userId = userId;
         this.requestType = requestType;
         this.date = LocalDateTime.now();
     }
 
-    public Request(String requestId, String host, int port, int userId, RequestType requestType, LocalDateTime dateTime){
+    public Request(String requestId, int userId, RequestType requestType, LocalDateTime dateTime){
         this.requestId = requestId;
-        this.host = host;
-        this.port = port;
         this.userId = userId;
         this.requestType = requestType;
         this.date = dateTime;
@@ -43,6 +37,10 @@ public abstract class Request implements Serializable {
 
     public RequestType getType(){
         return this.requestType;
+    }
+
+    public int getUserId(){
+        return this.userId;
     }
 
     private static class DataIndex {

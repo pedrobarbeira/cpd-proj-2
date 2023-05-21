@@ -3,21 +3,17 @@ package org.cpd.shared.request;
 import org.cpd.shared.Config;
 
 public class RequestFactory {
-    private final Config config;
-    private int count;
+    private static int count = 0;
 
-    public RequestFactory(Config config){
-        this.count = 0;
-        this.config = config;
-    }
 
-    public Request newRequest(RequestType type){
-        this.count++;
-        String requestId = String.format(Constants.REQUEST_ID_FORMAT, this.count, this.config.userId);
+    public static Request newRequest(RequestType type, int userId){
+        count++;
+        String requestId = String.format(Constants.REQUEST_ID_FORMAT, count, userId);
         return switch (type) {
-            case AUTH -> new AuthRequest(requestId, config);
-            case PLAY -> new PlayRequest(requestId, config);
-            case REGISTER -> new AuthRequest(requestId, config, true);
+            case AUTH -> new AuthRequest(requestId);
+            case REGISTER -> new AuthRequest(requestId, true);
+            case PLAY -> new PlayRequest(requestId, userId);
+            case DISCONNECT -> new PlayRequest(requestId, userId, true);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
