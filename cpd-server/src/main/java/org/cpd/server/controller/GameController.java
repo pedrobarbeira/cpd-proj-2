@@ -30,6 +30,7 @@ public class GameController implements Controller {
 
     @Override
     public Response handleRequest(Request request, SocketChannel socket) {
+        System.out.println("Handling Request in game controller");
         PlayRequest playRequest = (PlayRequest) request;
         if(playRequest.isDisconnect()){
             return handleDisconnectRequest(playRequest);
