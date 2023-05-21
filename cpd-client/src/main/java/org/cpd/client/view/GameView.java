@@ -77,7 +77,8 @@ public class GameView {
             String result = controller.makeMove(msg);
             System.out.println(result);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            wait(1000);
+            System.out.println("Looking for a match...");
         }
         msg = controller.turn();
         System.out.println(msg);
