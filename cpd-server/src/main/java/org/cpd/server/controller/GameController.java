@@ -71,6 +71,9 @@ public class GameController implements Controller {
         }
         throw new Exception("Could not get response");
     }
+    public static void sendMessage(SocketChannel socket, int userId,String message) throws  Exception{
+        ServerStub.sendMessage(socket,userId,message);
+    }
 
     public static void notifyWinner(SocketChannel socket, int userId) throws Exception {
         ServerStub.notifyWinner(socket, userId);

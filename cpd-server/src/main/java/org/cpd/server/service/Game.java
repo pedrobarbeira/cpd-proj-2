@@ -8,46 +8,72 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Game implements Runnable{
+public class Game implements Runnable {
 
     private final List<Pair<Integer, SocketChannel>> playerList;
 
-    public Game(List<Pair<Integer, SocketChannel>> playerList){
+    private final NumberGuessingGame game;
+
+    public Game(List<Pair<Integer, SocketChannel>> playerList) {
         this.playerList = playerList;
+        this.game = new NumberGuessingGame(playerList.size(), 3, 10);
+
+    }
+
+    private void setUp() throws Exception {
+        int c = 0;
+        for (var pair : playerList) {
+            GameController.sendMessage(pair.second, pair.first, game.greet(c));
+            c++;
+        }
+
+    }
+
+    private void update() throws Exception {
+        for (var pair : playerList) {
+            GameController.sendMessage(pair.second, pair.first, game.update());
+        }
+    }
+
+    private void loop() throws Exception {
+
+        while (!game.isGameOver()) {
+            for (var pair : playerList) {
+                update();
+                SocketChannel socket = pair.second;
+                try {
+                    String move = GameController.sendTurn(socket, pair.first);
+                    int guess;
+                    try {
+                        guess = Integer.parseInt(move);
+                    } catch (NumberFormatException e) {
+                        guess = 0;
+                    }
+                    game.nextRound(guess);
+                } catch (Exception e) {
+                    System.out.println("Something went wrong");
+                }
+            }
+        }
+    }
+
+    private void tearDown() throws  Exception{
+        int c = 0;
+        for (var pair : playerList) {
+            GameController.sendMessage(pair.second, pair.first, game.showResults(c));
+            c++;
+        }
     }
 
     @Override
     public void run() {
-        int maxPoints = 0;
-        int winnerId = 0;
-        for(Pair<Integer, SocketChannel> pair : playerList){
-            SocketChannel socket = pair.second;
-            try {
-                String move = GameController.sendTurn(socket, pair.first);
-                if (move.length() > maxPoints) {
-                    maxPoints = move.length();
-                    winnerId = pair.first;
-                }
-            }catch(Exception e){
-                System.out.println("Something went wrong");
-            }
+        try {
+            setUp();
+            loop();
+            tearDown();
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
         }
-        for(Pair<Integer, SocketChannel> pair : playerList){
-            if(pair.first != winnerId){
-                try {
-                    GameController.notifyLoser(pair.second, pair.first);
-                }catch(Exception e){
-                    System.out.println("Something went wrong");
-                }
-            }else{
-                try {
-                    GameController.notifyWinner(pair.second, pair.first);
-                }catch(Exception e){
-                    System.out.println("Something went wrong");
-                }
-            }
-        }
-
     }
 
 }

@@ -35,7 +35,7 @@ public class ServerStub {
         System.out.println(msg);
     }
 
-    private static void sendMessage(SocketChannel socket, int userId, String msg) throws IOException, ClassNotFoundException {
+    public static void sendMessage(SocketChannel socket, int userId, String msg) throws IOException, ClassNotFoundException {
         ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
         PlayRequest request = (PlayRequest) RequestFactory.newRequest(RequestType.PLAY, userId);
         request.setRequestBody(msg);
