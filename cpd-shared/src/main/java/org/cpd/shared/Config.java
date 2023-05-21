@@ -9,7 +9,7 @@ public class Config {
     public final int maxGames = 5;
     public final int rankOffset = 25;
     public final int timeout = 30;
-    public final int maxPlayers = 4;
+    public final int maxPlayers = 1;
 
     public final int NO_USER = 0;
 
