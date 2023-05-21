@@ -44,7 +44,7 @@ public class GameController implements Controller {
                 executor.execute(game);
             }
         }
-        return null;
+        return ResponseFactory.newResponse(request.getUserId(), Response.Status.OK, "Looking for a match", ResponseType.PLAY);
     }
 
     private Response handleDisconnectRequest(PlayRequest request){

@@ -61,14 +61,23 @@ public class ClientStub {
     public void registerPlay(){}
 
     public Response turn(){
-        try {
-            ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
-            return (Response) is.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            //TODO add reconnect protocol
-            System.out.println("Something went wrong");
+        int sleepCounts = 0;
+        while(true) {
+            try {
+                ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
+                return (Response) is.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                try {
+                    Thread.sleep(1000);
+                    sleepCounts = (sleepCounts + 1) % 5;
+                    if (sleepCounts == 0) {
+                        System.out.println("Still looking");
+                    }
+                } catch (InterruptedException ex) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return null;
     }
 
     public Response sendRequest(Request request) throws IOException, ClassNotFoundException {
