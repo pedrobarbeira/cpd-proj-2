@@ -4,8 +4,7 @@ import org.cpd.shared.Config;
 
 public class RequestFactory {
     private static int count = 0;
-
-
+    
     public static Request newRequest(RequestType type, int userId){
         count++;
         String requestId = String.format(Constants.REQUEST_ID_FORMAT, count, userId);

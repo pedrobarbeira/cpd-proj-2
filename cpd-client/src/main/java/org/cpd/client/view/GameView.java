@@ -69,10 +69,8 @@ public class GameView {
 
     private void play(){
         String msg;
-        do{
-            msg = controller.turn();
-            System.out.println(msg);
-        }while(!msg.equals(Messages.YOUR_TURN));
+        msg = controller.turn();
+        System.out.println(msg);
         System.out.println("$");
         try {
             msg = reader.readLine();
@@ -81,10 +79,8 @@ public class GameView {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        do{
-            msg = controller.turn();
-            System.out.println(msg);
-        }while(!msg.equals(Messages.YOU_WIN) && !msg.equals(Messages.YOU_LOSE));
+        msg = controller.turn();
+        System.out.println(msg);
     }
 
 

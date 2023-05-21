@@ -8,6 +8,8 @@ import org.cpd.shared.request.Request;
 import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.*;
 
+import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.UUID;
 
 public class AuthController extends RequestController implements Controller{
@@ -24,7 +26,7 @@ public class AuthController extends RequestController implements Controller{
     }
 
     @Override
-    public Response handleRequest(Request request) {
+    public Response handleRequest(Request request, SocketChannel socket) {
         if (request.getType() == RequestType.AUTH) {
             AuthRequest authRequest = (AuthRequest) request;
             Credentials credentials = authRequest.getCredentials();

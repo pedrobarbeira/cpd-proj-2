@@ -3,6 +3,7 @@ package org.cpd.client.service;
 import org.cpd.shared.Config;
 import org.cpd.shared.User;
 import org.cpd.shared.request.*;
+import org.cpd.shared.response.PlayResponse;
 import org.cpd.shared.response.Response;
 
 import java.io.IOException;
@@ -58,7 +59,18 @@ public class ClientStub {
 
     public void registerPlay(){}
 
-    private Response sendRequest(Request request) throws IOException, ClassNotFoundException {
+    public Response turn(){
+        try {
+            ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
+            return (Response) is.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            //TODO add reconnect protocol
+            System.out.println("Something went wrong");
+        }
+        return null;
+    }
+
+    public Response sendRequest(Request request) throws IOException, ClassNotFoundException {
         return sendRequest(request, socket);
     }
     private Response sendRequest(Request request, SocketChannel socket) throws IOException, ClassNotFoundException {
@@ -78,6 +90,4 @@ public class ClientStub {
             return null;
         }
     }
-
-
 }

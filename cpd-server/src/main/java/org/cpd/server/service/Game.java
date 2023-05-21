@@ -1,29 +1,53 @@
 package org.cpd.server.service;
 
-import org.cpd.shared.User;
+import org.cpd.server.controller.GameController;
+import org.cpd.shared.Pair;
 
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Game implements Runnable{
-    private int gameId;
-    private final Map<Integer, Socket> userSockets;
-    public Game(int players, Map<Integer, Socket> userSockets) {
-        if(players != userSockets.size()){
-            throw new RuntimeException("Number of players doesn't match number of sockets");
-        }
-        this.userSockets = userSockets;
-    }
 
-    public User start() {
-        System.out.println("Starting game with " + userSockets.size() + " players");
+    private final List<Pair<Integer, SocketChannel>> playerList;
 
-        //returns winner
-        return null;
+    public Game(List<Pair<Integer, SocketChannel>> playerList){
+        this.playerList = playerList;
     }
 
     @Override
     public void run() {
+        int maxPoints = 0;
+        int winnerId = 0;
+        for(Pair<Integer, SocketChannel> pair : playerList){
+            SocketChannel socket = pair.second;
+            try {
+                String move = GameController.sendTurn(socket, pair.first);
+                if (move.length() > maxPoints) {
+                    maxPoints = move.length();
+                    winnerId = pair.first;
+                }
+            }catch(Exception e){
+                System.out.println("Something went wrong");
+            }
+        }
+        for(Pair<Integer, SocketChannel> pair : playerList){
+            if(pair.first != winnerId){
+                try {
+                    GameController.notifyLoser(pair.second, pair.first);
+                }catch(Exception e){
+                    System.out.println("Something went wrong");
+                }
+            }else{
+                try {
+                    GameController.notifyWinner(pair.second, pair.first);
+                }catch(Exception e){
+                    System.out.println("Something went wrong");
+                }
+            }
+        }
 
     }
+
 }

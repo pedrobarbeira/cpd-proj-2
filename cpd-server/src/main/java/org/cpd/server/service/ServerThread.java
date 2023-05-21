@@ -1,4 +1,4 @@
-package org.cpd.server.model;
+package org.cpd.server.service;
 
 import org.cpd.server.controller.Controller;
 import org.cpd.server.controller.GameController;
@@ -10,6 +10,7 @@ import org.cpd.shared.request.Request;
 import org.cpd.shared.request.RequestType;
 import org.cpd.shared.response.PlayResponse;
 import org.cpd.shared.response.Response;
+import org.cpd.shared.response.ResponseType;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -37,22 +38,14 @@ public class ServerThread implements Runnable{
                 ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
                 Request request = (Request) is.readObject();
                 System.out.println("New client connected: " + request.getRequestBody());
-                Response response = controller.handleRequest(request);
-                switch(response.getResponseType()){
-                    case DISCONNECT -> {
+                Response response = controller.handleRequest(request, socket);
+                if(response != null) {
+                    ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
+                    os.writeObject(response);
+                    if (response.getResponseType().equals(ResponseType.DISCONNECT)) {
                         System.out.println("Disconnecting free socket");
-                        socket.close();
-                    }
-                    case PLAY ->{
-                        PlayRequest playRequest = (PlayRequest) request;
-                        String token = playRequest.getToken();
-                        GameType gameType = (GameType) playRequest.getRequestBody();
-                        GameController gameController = (GameController) controller;
-                        gameController.findMatch(token, socket, gameType);
                     }
                 }
-                ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
-                os.writeObject(response);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
