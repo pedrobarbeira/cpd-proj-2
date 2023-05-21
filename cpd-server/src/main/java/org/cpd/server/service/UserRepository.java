@@ -18,11 +18,11 @@ public class UserRepository {
 
 
     public UserRepository() {
-        count = 0;
         userData = new HashMap<>();
         try {
             assert dataUrl != null;
             File dir = new File(dataUrl.toURI());
+            count = Objects.requireNonNull(dir.listFiles()).length;
             for(File file : Objects.requireNonNull(dir.listFiles())) {
                 Scanner scanner = new Scanner(file);
                 while (scanner.hasNextLine()) {

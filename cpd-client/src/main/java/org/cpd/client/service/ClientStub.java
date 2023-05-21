@@ -25,7 +25,8 @@ public class ClientStub {
         return this.config;
     }
 
-    public void registerSocket(SocketChannel socket){
+    public void registerSocket(SocketChannel socket) throws IOException {
+        socket.configureBlocking(true);
         this.socket = socket;
     }
 
