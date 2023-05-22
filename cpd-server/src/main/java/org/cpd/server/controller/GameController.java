@@ -32,16 +32,17 @@ public class GameController implements Controller {
     public Response handleRequest(Request request, SocketChannel socket) {
         System.out.println("Handling Request in game controller");
         PlayRequest playRequest = (PlayRequest) request;
-        if(playRequest.isDisconnect()){
+        if (playRequest.isDisconnect()) {
             return handleDisconnectRequest(playRequest);
-        }else{
+        } else {
             GameType gameType = (GameType) playRequest.getRequestBody();
             Game game = null;
-            switch(gameType){
-                case RANK -> {}
+            switch (gameType) {
+                case RANK -> {
+                }
                 case NORMAL -> game = MatchMaker.findNormalMatch(request.getUserId(), socket);
             }
-            if(game != null){
+            if (game != null) {
                 executor.execute(game);
                 return ResponseFactory.newResponse(request.getUserId(), Response.Status.OK, "Game Started", ResponseType.PLAY);
             }
@@ -49,17 +50,19 @@ public class GameController implements Controller {
         return ResponseFactory.newResponse(request.getUserId(), Response.Status.OK, "Looking for a match", ResponseType.PLAY);
     }
 
-    private Response handleDisconnectRequest(PlayRequest request){
+    private Response handleDisconnectRequest(PlayRequest request) {
         System.out.println("[LOG] Received disconnect");
         int id = request.getUserId();
         String requestToken = request.getToken();
         String userToken = userRepository.getUserTokenById(id);
-        if(requestToken.equals(userToken)) {
+        if (requestToken.equals(userToken)) {
             if (!userRepository.saveById(id)) {
                 return ResponseFactory.newResponse(id, Response.Status.BAD, Messages.SAVE_ERROR, ResponseType.DISCONNECT);
             }
             System.out.println(Messages.DISCONNECTING);
             //TODO add logic to remove socket from MM;
+            var u = UserRepository.get();
+            u.logOut(id);
             return ResponseFactory.newResponse(id, Response.Status.OK, Messages.DISCONNECTING, ResponseType.DISCONNECT);
         }
         return ResponseFactory.newResponse(id, Response.Status.BAD, Messages.INVALID_TOKEN, ResponseType.DISCONNECT);
@@ -67,15 +70,20 @@ public class GameController implements Controller {
 
     public static String sendTurn(SocketChannel socket, int userId) throws Exception {
         PlayResponse response = ServerStub.sendTurn(socket, userId);
-        if(response != null) {
+        if (response != null) {
             if (response.getStatus() == Response.Status.OK) {
                 return (String) response.getResponseBody();
             }
         }
         throw new Exception("Could not get response");
     }
-    public static void sendMessage(SocketChannel socket, int userId,String message) throws  Exception{
-        ServerStub.sendMessage(socket,userId,message);
+
+    public static void sendMessage(SocketChannel socket, int userId, String message) throws Exception {
+        ServerStub.sendMessage(socket, userId, message);
+    }
+
+    public static void sendFeedBack(SocketChannel socket, int userId, String message) throws Exception {
+        ServerStub.sendFeedBack(socket, userId, message);
     }
 
     public static void notifyWinner(SocketChannel socket, int userId) throws Exception {
@@ -86,7 +94,7 @@ public class GameController implements Controller {
         ServerStub.notifyLoser(socket, userId);
     }
 
-    private static class Messages{
+    private static class Messages {
         public static final String SAVE_ERROR = "There was an error saving user information";
         public static final String INVALID_TOKEN = "Bad request: invalid user token";
         public static final String DISCONNECTING = "Disconnecting user";

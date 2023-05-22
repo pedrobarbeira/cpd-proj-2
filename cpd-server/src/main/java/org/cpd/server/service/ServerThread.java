@@ -19,7 +19,7 @@ import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class ServerThread implements Runnable{
+public class ServerThread implements Runnable {
 
     private final ServerSocketChannel serverSocket;
 
@@ -33,17 +33,18 @@ public class ServerThread implements Runnable{
 
     @Override
     public void run() {
-        while(true) {
+        while (true) {
             try {
                 SocketChannel socket = serverSocket.accept();
                 ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
                 Request request = (Request) is.readObject();
                 System.out.println("New client connected: " + request.getRequestBody());
                 Response response = controller.handleRequest(request, socket);
-                if(response != null) {
+                if (response != null) {
                     ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
                     os.writeObject(response);
                     if (response.getResponseType().equals(ResponseType.DISCONNECT)) {
+                        UserRepository.get().logOut(request.getUserId());
                         System.out.println("Disconnecting free socket");
                     }
                 }

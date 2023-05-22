@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 public class Main {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        final UserRepository userRepository = new UserRepository();
+        final UserRepository userRepository = UserRepository.get();
         final Config config = new Config();
         MatchMaker.config(config);
         ServerStub stub = new ServerStub(userRepository);

@@ -14,6 +14,7 @@ public class ResponseFactory {
             case AUTH -> new AuthResponse(requestId, userId, status, body);
             case PLAY -> new PlayResponse(requestId, userId, status, body);
             case DISCONNECT -> new PlayResponse(requestId, userId, status, body, true);
+            case FeedBack ->  new FeedBackResponse(requestId, userId, status, body,ResponseType.FeedBack);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

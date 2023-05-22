@@ -1,6 +1,7 @@
 package org.cpd.client.view;
 
 import org.cpd.client.controller.GameController;
+import org.cpd.client.controller.ServerMessage;
 import org.cpd.shared.User;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ public class GameView {
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private final GameController controller;
     private final User user;
+
     public GameView(User user, GameController controller) {
         this.controller = controller;
         controller.registerUser(user);
@@ -57,48 +59,56 @@ public class GameView {
         }
     }
 
-    private void normalMatch(){
+    private void normalMatch() {
         String msg = controller.findNormalMatch();
         System.out.println(msg);
         play();
     }
 
-    private void rankedMatch(){
+    private void rankedMatch() {
         String msg = controller.findRankedMatch();
         System.out.println(msg);
         play();
     }
 
-    private void play() {
-        String msg = null;
-        while (msg == null) {
-            msg = controller.turn();
-        }
-        System.out.println(msg);
-        System.out.println("$");
+    private void respond(){
         try {
-            msg = reader.readLine();
-            String result = controller.makeMove(msg);
-            System.out.println(result);
+            System.out.print("$");
+            String msg = reader.readLine();
+            controller.makeMove(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        msg = controller.turn();
-        System.out.println(msg);
+    }
+
+    private void play() {
+        ServerMessage msg = null;
+        boolean gameOver = false;
+        while (!gameOver) {
+            msg = controller.turn();
+            if(msg == null){
+               continue;
+            }
+            gameOver = msg.isOver();
+            System.out.println(msg.message());
+            if(msg.doRespond()){
+                respond();
+            }
+        }
     }
 
 
-    private void exit(){
+    private void exit() {
         int count = 0;
-        while(count < 3) {
-            if(!controller.disconnect(user)){
+        while (count < 3) {
+            if (!controller.disconnect(user)) {
                 count++;
-            }else break;
+            } else break;
         }
         System.out.println(AuthView.Messages.GOODBYE);
     }
 
-    private static class Messages{
+    private static class Messages {
         public static final String WELCOME = "\n\nWelcome %s";
         public static final String RANK = "Rank: %d";
         public static final String TOKEN = "Session Token: %s";
@@ -109,7 +119,8 @@ public class GameView {
         public static final String YOU_WIN = "Congratulations! You win!";
         public static final String YOU_LOSE = "You've lost. So sad :(";
     }
-    private static class Options{
+
+    private static class Options {
         public static final String NORMAL = "1";
         public static final String RANKED = "2";
         public static final String EXIT = "0";

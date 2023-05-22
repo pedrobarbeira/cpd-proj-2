@@ -100,4 +100,8 @@ public class NumberGuessingGame {
         }
         return res.toString();
     }
+
+    public int[] getPoints() {
+        return points;
+    }
 }

@@ -12,16 +12,17 @@ import java.net.Socket;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
 
-public class AuthController extends RequestController implements Controller{
+public class AuthController extends RequestController implements Controller {
     public static final int NULL_USER_ID = 0;
     public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String INVALID_REQUEST = "Invalid request type";
     public static final String USER_NOT_EXISTS = "User does not exist";
     public static final String USER_EXISTS = "User already exists";
+    public static final String USER_LOGGED_IN = "User already logged in";
 
     private final UserRepository repository;
 
-    public AuthController(UserRepository repository){
+    public AuthController(UserRepository repository) {
         this.repository = repository;
     }
 
@@ -45,15 +46,20 @@ public class AuthController extends RequestController implements Controller{
                 if (!user.validate(credentials.getPassword())) {
                     return ResponseFactory.newResponse(NULL_USER_ID, Response.Status.BAD, INVALID_CREDENTIALS, ResponseType.AUTH);
                 }
+                if (repository.isLoggedIn(user.getId())) {
+                    return ResponseFactory.newResponse(NULL_USER_ID, Response.Status.BAD, USER_LOGGED_IN, ResponseType.AUTH);
+                }
+
             }
             String token = generateToken();
             user.setToken(token);
+            repository.logIn(user.getId());
             return ResponseFactory.newResponse(user.getId(), Response.Status.OK, user, ResponseType.AUTH);
         }
         return ResponseFactory.newResponse(NULL_USER_ID, Response.Status.BAD, INVALID_REQUEST, ResponseType.AUTH);
     }
 
-    private String generateToken(){
+    private String generateToken() {
         return UUID.randomUUID().toString();
     }
 }

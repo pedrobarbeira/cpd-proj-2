@@ -5,6 +5,7 @@ import org.cpd.shared.Pair;
 
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class Game implements Runnable {
         int c = 0;
         for (var pair : playerList) {
             SocketChannel s = pair.second;
-            GameController.sendMessage(s, pair.first, game.greet(c));
+            GameController.sendFeedBack(s, pair.first, game.greet(c));
             c++;
         }
 
@@ -32,7 +33,7 @@ public class Game implements Runnable {
 
     private void update() throws Exception {
         for (var pair : playerList) {
-            GameController.sendMessage(pair.second, pair.first, game.update());
+            GameController.sendFeedBack(pair.second, pair.first, game.update());
         }
     }
 
@@ -58,12 +59,34 @@ public class Game implements Runnable {
         }
     }
 
-    private void tearDown() throws  Exception{
+
+    private void tearDown() throws Exception {
+        System.err.println("Running teardown");
         int c = 0;
         for (var pair : playerList) {
-            GameController.sendMessage(pair.second, pair.first, game.showResults(c));
+            GameController.sendFeedBack(pair.second, pair.first, game.showResults(c));
             c++;
         }
+        updateScores();
+        logUsersOut();
+    }
+
+    private void logUsersOut() {
+        List<Integer> results = new LinkedList<>();
+        for (var pair : playerList) {
+            results.add(pair.first);
+        }
+        UserRepository.logOutUsers(results);
+    }
+
+    private void updateScores() {
+        var points = game.getPoints();
+        List<Pair<Integer, Integer>> results = new LinkedList<>();
+        for (int i = 0; i < playerList.size(); i++) {
+            results.add(new Pair<>(playerList.get(i).first, points[i]));
+        }
+        UserRepository.updateScores(results);
+
     }
 
     @Override

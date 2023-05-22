@@ -6,7 +6,7 @@ import org.cpd.shared.Config;
 import org.cpd.shared.request.PlayRequest;
 import org.cpd.shared.request.RequestFactory;
 import org.cpd.shared.request.RequestType;
-import org.cpd.shared.response.PlayResponse;
+import org.cpd.shared.response.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -39,6 +39,11 @@ public class ServerStub {
         ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
         PlayRequest request = (PlayRequest) RequestFactory.newRequest(RequestType.PLAY, userId);
         request.setRequestBody(msg);
+        os.writeObject(request);
+    }
+    public static void sendFeedBack(SocketChannel socket, int userId, String msg) throws IOException, ClassNotFoundException {
+        ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
+        FeedBackResponse request = (FeedBackResponse) ResponseFactory.newResponse(userId, Response.Status.OK,msg,ResponseType.FeedBack);
         os.writeObject(request);
     }
 

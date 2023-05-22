@@ -1,5 +1,6 @@
 package org.cpd.client.service;
 
+import org.cpd.client.controller.Message;
 import org.cpd.shared.Config;
 import org.cpd.shared.User;
 import org.cpd.shared.request.*;
@@ -17,11 +18,11 @@ public class ClientStub {
     private final Config config;
     private SocketChannel socket;
 
-    public ClientStub(Config config){
+    public ClientStub(Config config) {
         this.config = config;
     }
 
-    public Config getConfig(){
+    public Config getConfig() {
         return this.config;
     }
 
@@ -31,19 +32,19 @@ public class ClientStub {
     }
 
 
-    public Response authenticate(String name, String password){
+    public Response authenticate(String name, String password) {
         AuthRequest request = (AuthRequest) RequestFactory.newRequest(RequestType.AUTH, config.NO_USER);
         request.setCredentials(name, password);
         return sendAuthRequest(request);
     }
 
-    public Response register(String name, String password){
+    public Response register(String name, String password) {
         AuthRequest request = (AuthRequest) RequestFactory.newRequest(RequestType.REGISTER, config.NO_USER);
         request.setCredentials(name, password);
         return sendAuthRequest(request);
     }
 
-    public Response disconnect(User user){
+    public Response disconnect(User user) {
         PlayRequest request = (PlayRequest) RequestFactory.newRequest(RequestType.DISCONNECT, user.getId());
         request.setToken(user.getToken());
         try {
@@ -54,19 +55,22 @@ public class ClientStub {
         }
     }
 
-    public void registerMatch(){}
+    public void registerMatch() {
+    }
 
-    public void playGame(){}
+    public void playGame() {
+    }
 
-    public void registerPlay(){}
+    public void registerPlay() {
+    }
 
-    public Response turn(){
+    public Message turn() {
         int sleepCounts = 0;
-        while(true) {
+        while (true) {
             try {
                 ObjectInputStream is = new ObjectInputStream(socket.socket().getInputStream());
-                return (Response) is.readObject();
-            } catch (IOException | ClassNotFoundException e) {
+                return Message.fromStream(is);
+            } catch (IOException e) {
                 try {
                     Thread.sleep(1000);
                     sleepCounts = (sleepCounts + 1) % 5;
@@ -83,6 +87,16 @@ public class ClientStub {
     public Response sendRequest(Request request) throws IOException, ClassNotFoundException {
         return sendRequest(request, socket);
     }
+
+    public void justSendRequest(Response r) throws IOException, ClassNotFoundException {
+        justSendRequest(r, socket);
+    }
+
+    private void justSendRequest(Response r, SocketChannel socket) throws IOException, ClassNotFoundException {
+        ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
+        os.writeObject(r);
+    }
+
     private Response sendRequest(Request request, SocketChannel socket) throws IOException, ClassNotFoundException {
         ObjectOutputStream os = new ObjectOutputStream(socket.socket().getOutputStream());
         os.writeObject(request);
@@ -90,8 +104,8 @@ public class ClientStub {
         return (Response) is.readObject();
     }
 
-    private Response sendAuthRequest(Request request){
-        try(SocketChannel socket = SocketChannel.open()){
+    private Response sendAuthRequest(Request request) {
+        try (SocketChannel socket = SocketChannel.open()) {
             socket.connect(new InetSocketAddress(config.host, config.authPort));
             return sendRequest(request, socket);
         } catch (IOException | ClassNotFoundException e) {

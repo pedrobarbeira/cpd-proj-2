@@ -5,5 +5,5 @@ public enum ResponseType{
     AUTH,
     PLAY,
     PING,
-    DISCONNECT
+    FeedBack, DISCONNECT
 }
