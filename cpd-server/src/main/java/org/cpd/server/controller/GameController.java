@@ -38,8 +38,7 @@ public class GameController implements Controller {
             GameType gameType = (GameType) playRequest.getRequestBody();
             Game game = null;
             switch (gameType) {
-                case RANK -> {
-                }
+                case RANK -> game = MatchMaker.findRankedMatch(request.getUserId(), socket);
                 case NORMAL -> game = MatchMaker.findNormalMatch(request.getUserId(), socket);
             }
             if (game != null) {

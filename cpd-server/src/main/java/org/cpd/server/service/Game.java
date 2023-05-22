@@ -17,7 +17,7 @@ public class Game implements Runnable {
 
     public Game(List<Pair<Integer, SocketChannel>> playerList) {
         this.playerList = List.copyOf(playerList);
-        this.game = new NumberGuessingGame(playerList.size(), 3, 10);
+        this.game = new NumberGuessingGame(playerList.size(), 99, 100);
 
     }
 
